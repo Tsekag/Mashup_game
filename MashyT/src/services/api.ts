@@ -125,17 +125,19 @@ class ApiClient {
     return response.json();
   }
 
-  async getGallery() {
-    return this.request('/uploads');
-  }
+  async getGallery(): Promise<{ uploads: any[] }> {
+  return this.request<{ uploads: any[] }>('/uploads');
+}
 
-  async getUserUploads(userId: string) {
-    return this.request(`/uploads/user/${userId}`);
-  }
+async getUserUploads(userId: string): Promise<{ uploads: any[] }> {
+  return this.request<{ uploads: any[] }>(`/uploads/user/${userId}`);
+}
 
-  async getUserStats(userId: string) {
-    return this.request(`/uploads/stats/${userId}`);
-  }
+async getUserStats(userId: string): Promise<{ totalUploads: number; totalLikes: number; favoriteGenre: string }> {
+  return this.request<{ totalUploads: number; totalLikes: number; favoriteGenre: string }>(
+    `/uploads/stats/${userId}`
+  );
+}
 
   // ---------------- Feedback ----------------
   async toggleLike(uploadId: string) {
