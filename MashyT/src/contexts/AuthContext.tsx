@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI } from '../services/api';
 
-// User interface for type safety
+// ✅ Updated User interface
 interface User {
   id: string;
   username: string;
   email: string;
-  role: 'user' | 'admin';
-  selectedGenres: string[];
-  uploads: any[];
-  createdAt?: string; // optional, since backend doesn't always return it
+  role?: 'user' | 'admin';
+  selectedGenres?: string[];
+  uploads?: any[];
+  createdAt?: string;
 }
 
 interface AuthContextType {
@@ -34,8 +34,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (token) {
         try {
           authAPI.setToken(token);
-          const response = await authAPI.getProfile();
-          setUser(response.user);
+          const profile = await authAPI.getProfile(); // ✅ not response.user
+          setUser(profile);
         } catch (error) {
           console.warn('Token invalid or expired, logging out');
           logout();
@@ -84,7 +84,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // 🔹 Logout
   const logout = () => {
     setUser(null);
-    // Clear both user and admin tokens to prevent conflicts
     localStorage.removeItem('auth_token');
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
@@ -94,8 +93,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // 🔹 Refresh profile
   const refreshProfile = async () => {
     try {
-      const response = await authAPI.getProfile();
-      setUser(response.user);
+      const profile = await authAPI.getProfile(); // ✅ not response.user
+      setUser(profile);
     } catch (error) {
       console.error('Profile refresh failed, logging out');
       logout();
@@ -107,7 +106,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
